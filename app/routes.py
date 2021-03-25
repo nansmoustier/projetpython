@@ -39,11 +39,35 @@ def index():
     return jsonify(data), 200
 
 
-
 @app.route('/login', methods=['POST'])
 def login():
-    return "Not implemented", 501
+    # on récupère le json envoyé par le client
+    formulaire_connexion = (request.get_json())
 
+    # on récupère l'email
+    email = formulaire_connexion["email"]
+
+    # on check si l'email existe, si oui on envoie une erreur
+    sql_request = f'''SELECT * FROM players WHERE players_email = "{email}"'''
+
+    players_avec_cette_email = sql_select(sql_request)
+
+    if len(players_avec_cette_email) == 0:
+        return "Email non existant", 503
+
+    #on récupère le password
+    password = formulaire_connexion["password"]
+
+    # on check si le password existe, si oui on envoie une erreur
+    sql_request = f'''SELECT * FROM players WHERE players_password = "{password}" AND players_email = "{email}"'''
+
+    players_avec_ce_password = sql_select(sql_request)
+
+    if len(players_avec_ce_password) == 0:
+        return "password non existant", 503
+    
+
+    return "Not implemented", 501
 
 
 @app.route('/signup', methods=['POST'])
